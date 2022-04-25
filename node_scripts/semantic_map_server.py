@@ -18,6 +18,7 @@ def main():
 
     rospy.init_node('semantic_map_server')
     map_info_path = rospy.get_param('~map_info')
+    frame_id = rospy.get_param('~map_frame_id', '/map')
     semantics = rospy.get_param('~semantics')
     semantics['unknown'] = [255, 255, 255]
 
@@ -58,7 +59,7 @@ def main():
         origin[2]).GetQuaternion()[3]
 
     msg_semantic_map_grid.header.stamp = msg_semantic_map_meta_data.map_load_time
-    msg_semantic_map_grid.header.frame_id = map_id
+    msg_semantic_map_grid.header.frame_id = frame_id
     msg_semantic_map_grid.info = msg_semantic_map_meta_data
     for index_height in range(msg_semantic_map_meta_data.height):
         for index_width in range(msg_semantic_map_meta_data.width):
@@ -76,9 +77,9 @@ def main():
     # cv2.waitKey(0)
 
     pub_semantic_map_grid = rospy.Publisher(
-        '~semantic_map', SemanticMapGrid, queue_size=1, latch=True)
+        '/semantic_map', SemanticMapGrid, queue_size=1, latch=True)
     pub_semantic_map_meta_data = rospy.Publisher(
-        '~semantic_map_meta_data', SemanticMapMetaData, queue_size=1, latch=True)
+        '/semantic_map_meta_data', SemanticMapMetaData, queue_size=1, latch=True)
 
     pub_semantic_map_grid.publish(msg_semantic_map_grid)
     pub_semantic_map_meta_data.publish(msg_semantic_map_meta_data)
