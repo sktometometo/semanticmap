@@ -5,7 +5,8 @@ find_package(catkin REQUIRED
     message_generation
     roscpp
     rospy
-    sensor_msgs
+    std_msgs
+    geometry_msgs
     )
 
 catkin_python_setup()
@@ -18,6 +19,8 @@ add_message_files(
 )
 generate_messages(
   DEPENDENCIES
+  std_msgs
+  geometry_msgs
 )
 
 catkin_package(
