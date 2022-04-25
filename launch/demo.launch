@@ -1,0 +1,23 @@
+<launch>
+    <arg name="map_yaml" default="$(find semanticmap)/maps/eng2-7f-0.05_semantics.yaml" />
+
+    <node
+        pkg="semanticmap"
+        type="semantic_map_server.py"
+        name="semantic_map_server"
+        output="screen"
+        required="true"
+        >
+        <rosparam subst_value="true">
+            map_info: $(arg map_yaml)
+        </rosparam>
+
+        <!-- pixels are RGB -->
+        <rosparam ns="semantics" subst_value="true">
+            empty: [255, 255, 255]
+            wall: [0, 0, 0]
+            door: [255, 0, 0]
+            elevator: [255, 255, 0]
+        </rosparam>
+    </node>
+</launch>
