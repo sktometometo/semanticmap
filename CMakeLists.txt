@@ -14,6 +14,7 @@ catkin_python_setup()
 add_message_files(
   FILES
   GridCell.msg
+  GridCellArray.msg
   SemanticMapGrid.msg
   SemanticMapMetaData.msg
 )
