@@ -29,7 +29,7 @@ class SemanticCelListServer(object):
         self.tf_broadcaster = tf2_ros.TransformBroadcaster()
 
         self.msg_grid = rospy.wait_for_message('/semantic_map', SemanticMapGrid)
-        self.msg_meta = rospy.wait_for_message('/semantic_map_metadata', SemanticMapMetaData)
+        self.msg_meta = rospy.wait_for_message('/semantic_map_meta_data', SemanticMapMetaData)
 
         self.pub_pose_array = rospy.Publisher(
             '~debug_pose_array', PoseArray, queue_size=1)
@@ -38,6 +38,8 @@ class SemanticCelListServer(object):
 
         self.sub = rospy.Subscriber(
             '/move_base/TrajectoryPlannerROS/local_plan', Path, self.callback)
+
+        rospy.loginfo('initialized')
 
     def publish_pose_array(self, kdlframe_list, frame_id):
 
@@ -65,7 +67,7 @@ class SemanticCelListServer(object):
     def publish_cell_array(self, grid_cell_array):
         msg = GridCellArray()
         msg.array = grid_cell_array
-        self.pub_pose_array.publish(msg)
+        self.pub_grid_cell_array.publish(msg)
 
     def broadcast(self, kdlframe, parent_frame_id, child_frame_id):
 
@@ -88,8 +90,11 @@ class SemanticCelListServer(object):
             msg_path, self.msg_grid, self.msg_meta)
         self.publish_pose_array(kdlframe_list_on_grid, self.msg_grid.header.frame_id)
         self.publish_cell_array(semantics_cell_list)
+        rospy.logerr('semantics_cell_list: {}'.format(semantics_cell_list))
 
     def get_pose_list_on_grid_from_path(self, msg_path, msg_grid, msg_meta):
+
+        rospy.logerr('uniq grid semantics: {}'.format(set([ x.semantics_name for x in msg_grid.data])))
 
         grid_frame_id = msg_grid.header.frame_id
         path_frame_id = msg_path.header.frame_id
@@ -159,13 +164,27 @@ class SemanticCelListServer(object):
             kdlframe_list_on_grid_pose.append(kdlframe_grid_pose_to_path_pose)
 
         semantics_cell_list = []
+        calced_kdlframe_list_on_grid_pose = []
 
         for kdlframe in kdlframe_list_on_grid_pose:
 
-            index_x = int(kdlframe.p[0] / msg_grid.info.resolution)
-            index_y = int(kdlframe.p[1] / msg_grid.info.resolution)
-            semantics_cell = msg_grid.data[index_x + msg_grid.info.width * index_y]
+            index_x = int(kdlframe.p[1] / msg_grid.info.resolution) # y is width direction
+            index_y = int(kdlframe.p[0] / msg_grid.info.resolution) # x is height direction
+            rospy.logwarn('index_x: {}, index_y: {}'.format(index_x, index_y))
+            semantics_cell = msg_grid.data[index_y + msg_grid.info.height * index_x] # something wrong here
+            calced_kdlframe_list_on_grid_pose.append(
+                    PyKDL.Frame(
+                        PyKDL.Rotation(),
+                        PyKDL.Vector(
+                            index_y * msg_grid.info.resolution,
+                            index_x * msg_grid.info.resolution,
+                            0
+                            ),
+                        )
+                    )
             semantics_cell_list.append(semantics_cell)
+
+        kdlframe_list_on_grid_frame = [ kdlframe_grid_frame_to_grid_pose * f for f in calced_kdlframe_list_on_grid_pose ]
 
         return kdlframe_list_on_grid_frame, semantics_cell_list
 

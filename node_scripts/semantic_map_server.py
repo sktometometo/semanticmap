@@ -18,9 +18,9 @@ def main():
 
     rospy.init_node('semantic_map_server')
     map_info_path = rospy.get_param('~map_info')
-    frame_id = rospy.get_param('~map_frame_id', '/map')
+    frame_id = rospy.get_param('~map_frame_id', 'map')
     semantics = rospy.get_param('~semantics')
-    semantics['unknown'] = [255, 255, 255]
+    semantics['unknown'] = [128, 128, 128]
 
     with open(map_info_path) as f:
         map_info = yaml.load(f, Loader=yaml.Loader)
