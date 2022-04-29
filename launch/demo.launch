@@ -20,4 +20,13 @@
             elevator: [255, 255, 0]
         </rosparam>
     </node>
+
+    <node
+        pkg="semanticmap"
+        type="semantic_cell_list_server.py"
+        name="semantic_cell_list_server"
+        output="screen"
+        required="true"
+        >
+    </node>
 </launch>
