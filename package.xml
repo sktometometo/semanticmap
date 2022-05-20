@@ -14,10 +14,14 @@
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
+  <build_depend>rviz</build_depend>
   <build_export_depend>message_generation</build_export_depend>
+  <build_export_depend>rviz</build_export_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
 
-  <export></export>
+  <export>
+      <rviz plugin="${prefix}/rviz_plugin_description.xml"/>
+  </export>
 </package>

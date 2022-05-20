@@ -7,6 +7,7 @@ find_package(catkin REQUIRED
     rospy
     std_msgs
     geometry_msgs
+    rviz
     )
 
 catkin_python_setup()
@@ -31,6 +32,12 @@ catkin_package(
 catkin_install_python(PROGRAMS
     node_scripts/semantic_map_server.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+include_directories(${catkin_INCLUDE_DIRS})
+
+add_library(${PROJECT_NAME}
+    src/semantic_map_grid.cpp
 )
 
 #############
